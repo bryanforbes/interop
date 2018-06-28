@@ -1,27 +1,13 @@
-import { v } from '@dojo/widget-core/d';
+import { dom } from '@dojo/widget-core/d';
 import { VNode } from '@dojo/widget-core/interfaces';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import afterRender from '@dojo/widget-core/decorators/afterRender';
-import Base from '@dojo/widget-core/meta/Base';
-import * as dgrid from 'dgrid';
-import * as dstore from 'dojo-dstore';
+import * as declare from 'dojo/_base/declare';
+import * as Grid from 'dgrid/Grid';
+import * as Pagination from 'dgrid/extensions/Pagination';
+import * as MemoryStore from 'dstore/Memory';
 
-/**
- * An internal meta provider that provides the rendered DOM node on _root_ Dijits
- */
-class DomNode extends Base {
-	public get(key: string | number) {
-		return this.getNode(key);
-	}
-}
-
-/**
- * Internal `key` constant
- */
-const DEFAULT_KEY = 'root';
-
-export interface DgridWrapperProperties<T> {
-	data: T[];
+export interface DgridWrapperProperties {
+	data: {}[];
 	columns: {}[];
 }
 
@@ -30,34 +16,40 @@ export interface DgridWrapperProperties<T> {
  * @param Dijit The constructor function for the Dijit
  * @param tagName The tag name that should be used when creating the DOM for the dijit. Defaults to `div`.
  */
-class DgridWrapper<T = {}> extends WidgetBase<DgridWrapperProperties<T>> {
-	private _grid: dgrid.Pagination<T> | undefined;
+class DgridWrapper extends WidgetBase<DgridWrapperProperties> {
+	private _grid: Grid | undefined;
 	private _node: HTMLElement | undefined;
 
-	private _updateGrid(data: T[]) {
+	private _updateGrid(data: {}[]) {
 		// not null assertion, because this can only be called when `_dijit` is assigned
-		this._grid!.setData(data);
+		this._grid!.get('collection').setData(data);
 	}
 
 	protected render(): VNode {
-		const { key = DEFAULT_KEY, data } = this.properties;
+		const { data } = this.properties;
 		if (this._grid) {
 			this._updateGrid(data);
+		} else {
+			this.initGrid();
 		}
 
-		return v('div', { key });
+		return dom({ node: this._node! });
+	}
+
+	protected onAttach(): void {
+		this._grid && this._grid.startup();
 	}
 
 	protected onDetach(): void {
 		this._grid && this._grid.destroy();
 	}
 
-	@afterRender()
 	public initGrid() {
-		this._node = this.meta(DomNode).get('root') as HTMLElement;
-		this._grid = new dgrid.Pagination(
+		this._node = document.createElement('div');
+		const Constructor = declare([Grid, Pagination] as any);
+		this._grid = new Constructor(
 			{
-				collection: new dstore.MemoryStore({ data: this.properties.data }),
+				collection: new MemoryStore({ data: this.properties.data }),
 				columns: this.properties.columns
 			},
 			this._node
