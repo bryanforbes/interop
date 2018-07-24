@@ -1,59 +1,43 @@
-import { dom } from '@dojo/widget-core/d';
-import { VNode } from '@dojo/widget-core/interfaces';
+import { DNode } from '@dojo/widget-core/interfaces';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import * as declare from 'dojo/_base/declare';
-import * as Grid from 'dgrid/Grid';
-import * as Pagination from 'dgrid/extensions/Pagination';
-import * as MemoryStore from 'dstore/Memory';
+import { diffProperty } from '@dojo/widget-core/decorators/diffProperty';
+import { DgridWrapperProperties, constructionKeys } from './DgridWrapperProperties';
+import { DgridInnerWrapper, DgridState } from './DgridInnerWrapper';
+import { w } from '@dojo/widget-core/d';
+import { columnsDiff } from './diff';
 
-export interface DgridWrapperProperties {
-	data: {}[];
-	columns: {}[];
-}
+const keyPrefix = 'dgridWrapper';
 
-/**
- * Wrap a Dojo 1 Dijit, so that it can exist inside of the Dojo 2 widgeting system.
- * @param Dijit The constructor function for the Dijit
- * @param tagName The tag name that should be used when creating the DOM for the dijit. Defaults to `div`.
- */
-class DgridWrapper extends WidgetBase<DgridWrapperProperties> {
-	private _grid: Grid | undefined;
-	private _node: HTMLElement | undefined;
+@diffProperty('columns', columnsDiff)
+export class DgridWrapper extends WidgetBase<DgridWrapperProperties> {
+	key = 0;
+	gridState: DgridState;
 
-	private _updateGrid(data: {}[]) {
-		// not null assertion, because this can only be called when `_dijit` is assigned
-		this._grid!.get('collection').setData(data);
-	}
-
-	protected render(): VNode {
-		const { data } = this.properties;
-		if (this._grid) {
-			this._updateGrid(data);
+	protected render(): DNode | DNode[] {
+		const changedPropertyKeys = this.changedPropertyKeys;
+		// Some properties require the dgrid grid to be destroyed and recreated because a different
+		// combination of mixins is required.  Some properties when changed can be handled by an existing
+		// grid.  Determine if a new grid is needed or not.  If a new grid is needed, generate a new
+		// key and let the vdom throw away the old grid.
+		if (changedPropertyKeys.indexOf('features') >= 0) {
+			this.key++;
 		} else {
-			this.initGrid();
+			const gridConstructionKeys = changedPropertyKeys.filter((key) => {
+				return constructionKeys.indexOf(key) >= 0;
+			});
+			if (gridConstructionKeys.length) {
+				this.key++;
+			}
 		}
-
-		return dom({ node: this._node! });
-	}
-
-	protected onAttach(): void {
-		this._grid && this._grid.startup();
-	}
-
-	protected onDetach(): void {
-		this._grid && this._grid.destroy();
-	}
-
-	public initGrid() {
-		this._node = document.createElement('div');
-		const Constructor = declare([Grid, Pagination] as any);
-		this._grid = new Constructor(
-			{
-				collection: new MemoryStore({ data: this.properties.data }),
-				columns: this.properties.columns
-			},
-			this._node
-		);
+		return w(DgridInnerWrapper, {
+			key: keyPrefix + this.key,
+			...this.properties,
+			gridState: this.gridState,
+			onGridState: (gridState: DgridState) => {
+				this.gridState = gridState;
+				console.log('Received grid state:', gridState);
+			}
+		});
 	}
 }
 

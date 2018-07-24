@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/@types/dojo/index.d.ts" />
-
 interface Handle {
 	remove(): void;
 }
@@ -427,6 +425,7 @@ declare module 'dgrid/Grid' {
 		hasNeutralSort: boolean;
 		cellNavigation: boolean;
 		formatterScope: any;
+		_currentPage: number;
 
 		column(target: any): Grid.Column;
 		cell(target: Grid.CellArg, columnId?: string): Grid.Cell<any>;
@@ -587,7 +586,7 @@ declare module 'dgrid/List' {
 		highlightRow(rowElement: HTMLElement | List.Row<any>, delay?: number): void;
 		insertRow(object: any, parent: HTMLElement, beforeNode: Node, i: number, options?: any): HTMLElement;
 
-		on: dojo.on;
+		on(eventType: string, listener: Function): Handle;
 
 		_onNotification(rows?: any[], object?: any, from?: number, to?: number): void;
 		refresh(): void;
