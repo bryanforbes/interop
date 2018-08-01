@@ -1,6 +1,6 @@
-import { dom } from '@dojo/widget-core/d';
-import { VNode } from '@dojo/widget-core/interfaces';
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
+import { dom } from '@dojo/framework/widget-core/d';
+import { VNode } from '@dojo/framework/widget-core/interfaces';
+import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
 import { duplicate } from '@dojo/core/lang';
 import { DgridWrapperProperties } from './DgridWrapperProperties';
 import * as declare from 'dojo/_base/declare';

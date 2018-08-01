@@ -50,6 +50,7 @@
     "@dojo/framework": "~3.0.0",
     "@dojo/loader": "^2.0.0",
     "@dojo/scripts": "~3.0.1",
+    "@types/dojo": "^1.9.40",
     "@types/node": "~9.6.5",
     "@types/sinon": "~4.1.2",
     "codecov": "~3.0.4",
@@ -63,6 +64,7 @@
   },
   "dependencies": {
     "dgrid": "^1.2.1",
+    "dojo": "^1.13.0",
     "dojo-dstore": "^1.1.2",
     "tslib": "1.8.1"
   },

@@ -1,9 +1,9 @@
-import { DNode } from '@dojo/widget-core/interfaces';
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
-import { diffProperty } from '@dojo/widget-core/decorators/diffProperty';
+import { DNode } from '@dojo/framework/widget-core/interfaces';
+import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
+import { diffProperty } from '@dojo/framework/widget-core/decorators/diffProperty';
 import { DgridWrapperProperties, constructionKeys } from './DgridWrapperProperties';
 import { DgridInnerWrapper, DgridState } from './DgridInnerWrapper';
-import { w } from '@dojo/widget-core/d';
+import { w } from '@dojo/framework/widget-core/d';
 import { columnsDiff } from './diff';
 
 const keyPrefix = 'dgridWrapper';

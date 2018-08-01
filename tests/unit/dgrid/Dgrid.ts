@@ -1,14 +1,14 @@
 const { registerSuite } = intern.getInterface('object');
 const { assert } = intern.getPlugin('chai');
 
-import harness from '@dojo/test-extras/harness';
+import harness from '@dojo/framework/testing/harness';
 import DgridWrapper from '../../../src/dgrid/DgridWrapper';
 import DgridWrapperProperties from '../../../src/dgrid/DgridWrapperProperties';
 import { DgridInnerWrapperProperties } from '../../../src/dgrid/DgridInnerWrapper';
 
-import { w } from '@dojo/widget-core/d';
-import { ProjectorMixin } from '@dojo/widget-core/mixins/Projector';
-import { WidgetBase } from '@dojo/widget-core/WidgetBase';
+import { w } from '@dojo/framework/widget-core/d';
+import { ProjectorMixin } from '@dojo/framework/widget-core/mixins/Projector';
+import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
 import { ColumnSpec } from 'dgrid/Grid';
 
 registerSuite('dgrid/Dgrid VDOM', {

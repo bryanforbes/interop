@@ -1,4 +1,4 @@
-import { WidgetProperties } from '@dojo/widget-core/interfaces';
+import { WidgetProperties } from '@dojo/framework/widget-core/interfaces';
 
 export interface DgridWrapperProperties extends WidgetProperties {
 	features?: {
