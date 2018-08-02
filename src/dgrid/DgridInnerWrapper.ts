@@ -23,7 +23,7 @@ export interface DgridInnerWrapperProperties extends DgridWrapperProperties {
 	// a dgrid grid can be destroyed and recreated back to the same state when
 	// desired.
 	gridState?: DgridState;
-	onGridState?: (state: DgridState) => void;
+	onGridState: (state: DgridState) => void;
 }
 
 interface DgridGrid extends Grid, Pagination {}
@@ -50,13 +50,11 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 
 	protected onAttach(): void {
 		const grid = this.grid;
-		if (grid) {
-			const handle = grid.on('dgrid-refresh-complete', () => {
-				handle.remove();
-				this.restoreGridState();
-			});
-			grid.startup();
-		}
+		const handle = grid.on('dgrid-refresh-complete', () => {
+			handle.remove();
+			this.restoreGridState();
+		});
+		grid.startup();
 	}
 
 	protected onDetach(): void {
@@ -64,17 +62,9 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 	}
 
 	private emitGridState(): void {
-		const { onGridState } = this.properties;
-		const grid = this.grid;
-		if (grid) {
-			if (onGridState) {
-				const gridState: DgridState = {};
-				if (grid.gotoPage) {
-					gridState.currentPage = grid._currentPage;
-				}
-				onGridState(gridState);
-			}
-		}
+		this.properties.onGridState({
+			currentPage: this.grid._currentPage
+		});
 	}
 
 	private initGrid(): DgridGrid {
@@ -132,19 +122,13 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 		const properties: any = this.properties;
 		const changeProperties: any = {};
 		this.changedPropertyKeys.forEach((key) => {
-			const value = properties[key];
-			if (value != null) {
-				changeProperties[key] = value;
-			}
+			changeProperties[key] = properties[key];
 		});
 		this.grid && this.grid.set(this.filterProperties(changeProperties));
 	}
 }
 
 function duplicateColumnDef(columnsSpec: Grid.ColumnSpec): Grid.ColumnSpec {
-	if (columnsSpec == null) {
-		return columnsSpec;
-	}
 	if (Array.isArray(columnsSpec)) {
 		if (columnsSpec.length === 0) {
 			return [];

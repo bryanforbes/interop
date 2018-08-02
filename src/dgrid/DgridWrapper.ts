@@ -35,7 +35,6 @@ export class DgridWrapper extends WidgetBase<DgridWrapperProperties> {
 			gridState: this.gridState,
 			onGridState: (gridState: DgridState) => {
 				this.gridState = gridState;
-				console.log('Received grid state:', gridState);
 			}
 		});
 	}

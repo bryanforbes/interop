@@ -7,7 +7,6 @@
 		"suites+": [
 			"./dist/dev/tests/unit/dgrid/all.js"
 		],
-
 		"loader": {
 			"script": "./node_modules/@dojo/scripts/intern/loader.js",
 			"options": {
