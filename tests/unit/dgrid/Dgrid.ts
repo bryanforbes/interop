@@ -4,7 +4,7 @@ const { assert } = intern.getPlugin('chai');
 import harness from '@dojo/framework/testing/harness';
 import DgridWrapper from '../../../src/dgrid/DgridWrapper';
 import DgridWrapperProperties from '../../../src/dgrid/DgridWrapperProperties';
-import { DgridInnerWrapperProperties } from '../../../src/dgrid/DgridInnerWrapper';
+import { DgridInnerWrapperProperties } from '../../../src/dgrid/DgridInnerWrapperProperties';
 
 import { w } from '@dojo/framework/widget-core/d';
 import { ProjectorMixin } from '@dojo/framework/widget-core/mixins/Projector';
@@ -469,5 +469,20 @@ registerSuite('dgrid/Dgrid DOM', {
 				});
 			}
 		}
+	},
+
+	'Keyboard tab index'() {
+		const projector = new TestProjector();
+		projector.testProperties.features!.keyboard = true;
+		projector.testProperties.tabIndex = 5;
+		projector.sandbox();
+
+		// Check to see if a dgrid grid rendered with pagination.
+		const gridNode = projector.root.firstChild! as HTMLElement;
+		assert.isNotNull(gridNode);
+
+		const cells = gridNode.querySelectorAll('th.dgrid-cell');
+		assert.isNotNull(cells);
+		assert.strictEqual('5', cells[0].getAttribute('tabindex'));
 	}
 });

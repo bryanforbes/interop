@@ -3,12 +3,14 @@ import { VNode } from '@dojo/framework/widget-core/interfaces';
 import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
 import { duplicate } from '@dojo/core/lang';
 import { DgridWrapperProperties } from './DgridWrapperProperties';
-import * as declare from 'dojo/_base/declare';
 import * as Grid from 'dgrid/Grid';
 import * as StoreMixin from 'dgrid/_StoreMixin';
 import * as OnDemandGrid from 'dgrid/OnDemandGrid';
+import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
 import * as MemoryStore from 'dstore/Memory';
+import { DgridInnerWrapperProperties } from './DgridInnerWrapperProperties';
+import { buildConstructor } from './dgridConstructorFactory';
 
 /**
  * When a dgrid grid is destroyed some of its state will need to be restored when the next
@@ -18,15 +20,7 @@ export interface DgridState {
 	currentPage?: number;
 }
 
-export interface DgridInnerWrapperProperties extends DgridWrapperProperties {
-	// The inner wrapper can pass a state object to the outer wrapper widget so
-	// a dgrid grid can be destroyed and recreated back to the same state when
-	// desired.
-	gridState?: DgridState;
-	onGridState: (state: DgridState) => void;
-}
-
-interface DgridGrid extends Grid, Pagination {}
+interface DgridGrid extends Grid, Pagination, Keyboard {}
 
 /**
  * Wrap a dgrid widget, so that it can exist inside of the Dojo 2 widgeting system.
@@ -68,7 +62,7 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 	}
 
 	private initGrid(): DgridGrid {
-		const Constructor = this.buildConstructor();
+		const Constructor = buildConstructor(this.properties, this.emitGridState.bind(this));
 		return new Constructor(this.filterProperties(this.properties));
 	}
 
@@ -80,28 +74,6 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 				this.grid.gotoPage(currentPage);
 			}
 		}
-	}
-
-	private buildConstructor() {
-		let pagination;
-		const features = this.properties.features;
-		if (features) {
-			pagination = features.pagination;
-		}
-		const emitGridState = this.emitGridState.bind(this);
-
-		let Constructor;
-		if (pagination) {
-			Constructor = declare([Grid, Pagination] as any, {
-				_updateNavigation: function _updateNavigation(total: number) {
-					this.inherited(_updateNavigation, arguments);
-					emitGridState();
-				}
-			});
-		} else {
-			Constructor = declare([OnDemandGrid] as any);
-		}
-		return Constructor;
 	}
 
 	private filterProperties(properties: DgridWrapperProperties): DgridProperties {

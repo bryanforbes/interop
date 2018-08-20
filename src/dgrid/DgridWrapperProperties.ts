@@ -4,6 +4,8 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	features?: {
 		// Setting pagination to true turns off infinite scrolling and displays rows in discrete pages.
 		pagination?: boolean;
+		// Add keyboard navigation capability.
+		keyboard?: boolean;
 	};
 
 	// Grid properties
@@ -25,6 +27,10 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	pagingLinks?: number;
 	pageSizeOptions?: number[];
 	showLoadingMessage?: boolean;
+
+	// Keyboard properties
+	pageSkip?: number;
+	tabIndex?: number;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
