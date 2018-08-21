@@ -1,16 +1,22 @@
 import { dom } from '@dojo/framework/widget-core/d';
-import { VNode } from '@dojo/framework/widget-core/interfaces';
+import { DNode } from '@dojo/framework/widget-core/interfaces';
 import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
 import { duplicate } from '@dojo/core/lang';
-import { DgridWrapperProperties } from './DgridWrapperProperties';
+import { DgridWrapperProperties, SelectionData, SelectionType } from './DgridWrapperProperties';
 import * as Grid from 'dgrid/Grid';
 import * as StoreMixin from 'dgrid/_StoreMixin';
 import * as OnDemandGrid from 'dgrid/OnDemandGrid';
 import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
 import * as MemoryStore from 'dstore/Memory';
+import * as Selection from 'dgrid/Selection';
 import { DgridInnerWrapperProperties } from './DgridInnerWrapperProperties';
 import { buildConstructor } from './dgridConstructorFactory';
+
+interface DgridSelectionEvent extends Event {
+	rows?: { data: any }[];
+	cells?: { data: any }[];
+}
 
 /**
  * When a dgrid grid is destroyed some of its state will need to be restored when the next
@@ -20,7 +26,23 @@ export interface DgridState {
 	currentPage?: number;
 }
 
-interface DgridGrid extends Grid, Pagination, Keyboard {}
+interface DgridGrid extends Grid, Pagination, Keyboard, Selection {}
+
+function buildSelectEvent(event: DgridSelectionEvent): SelectionData {
+	const selectionType = event.rows ? SelectionType.row : SelectionType.cell;
+	const data: SelectionData = {
+		type: selectionType,
+		data: []
+	};
+	if (selectionType === SelectionType.row) {
+		event.rows &&
+			(data.data = event.rows.map((rowData) => {
+				return rowData.data;
+			}));
+	}
+
+	return data;
+}
 
 /**
  * Wrap a dgrid widget, so that it can exist inside of the Dojo 2 widgeting system.
@@ -32,10 +54,11 @@ interface DgridGrid extends Grid, Pagination, Keyboard {}
 export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 	private grid: DgridGrid;
 
-	protected render(): VNode {
+	protected render(): DNode | DNode[] {
 		let grid = this.grid;
 		if (!grid) {
 			grid = this.grid = this.initGrid();
+			this.registerGridEvents();
 		} else {
 			this.setChangedGridProperites();
 		}
@@ -100,6 +123,24 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 			changeProperties[key] = properties[key];
 		});
 		this.grid && this.grid.set(this.filterProperties(changeProperties));
+	}
+
+	private registerGridEvents(): void {
+		const properties = this.properties;
+		if (properties.features) {
+			const { selection } = properties.features;
+			if (selection) {
+				const grid = this.grid;
+				grid.on('dgrid-select', (event: DgridSelectionEvent) => {
+					const onSelect = properties.onSelect;
+					onSelect && onSelect(buildSelectEvent(event), grid.selection);
+				});
+				grid.on('dgrid-deselect', (event: DgridSelectionEvent) => {
+					const onDeselect = properties.onDeselect;
+					onDeselect && onDeselect(buildSelectEvent(event), grid.selection);
+				});
+			}
+		}
 	}
 }
 

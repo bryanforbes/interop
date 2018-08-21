@@ -1,14 +1,19 @@
-const { registerSuite } = intern.getInterface('object');
-const { assert } = intern.getPlugin('chai');
-
+import TestProjector from './TestProjector';
 import harness from '@dojo/framework/testing/harness';
 import DgridWrapper from '../../../src/dgrid/DgridWrapper';
-import DgridWrapperProperties from '../../../src/dgrid/DgridWrapperProperties';
+import DgridWrapperProperties, {
+	SelectionData,
+	SelectionMode,
+	SelectionType
+} from '../../../src/dgrid/DgridWrapperProperties';
 import { DgridInnerWrapperProperties } from '../../../src/dgrid/DgridInnerWrapperProperties';
 
 import { w } from '@dojo/framework/widget-core/d';
-import { ProjectorMixin } from '@dojo/framework/widget-core/mixins/Projector';
-import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
+
+const { registerSuite } = intern.getInterface('object');
+const { assert } = intern.getPlugin('chai');
+
+let projector: TestProjector;
 
 registerSuite('dgrid/Dgrid VDOM', {
 	'basic vdom render'() {
@@ -223,94 +228,75 @@ registerSuite('dgrid/Dgrid VDOM', {
 	}
 });
 
-class TestProjector extends ProjectorMixin(WidgetBase) {
-	testProperties: DgridWrapperProperties = {
-		data: [
-			{
-				id: 1,
-				first: 'first',
-				last: 'last'
-			}
-		],
-		columns: {
-			first: 'First',
-			last: 'Last'
-		},
-		features: {
-			pagination: true
-		}
-	};
-
-	render() {
-		return w(DgridWrapper, { ...this.testProperties });
-	}
-}
-
 let sandbox: HTMLElement;
 
 registerSuite('dgrid/Dgrid DOM', {
 	'basic DOM render'() {
 		const projector = new TestProjector();
+		projector.testProperties.features!.pagination = true;
 		projector.sandbox();
 
 		// Check to see if a dgrid grid rendered with pagination.
 		const gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 
 		const cells = gridNode.querySelectorAll('.dgrid-cell');
-		assert.strictEqual(cells.length, 4);
+		assert.strictEqual(cells.length, 6);
 
-		['First', 'Last', 'first', 'last'].forEach((text, i) => {
+		['First', 'Last', 'first 1', 'last 1'].forEach((text, i) => {
 			assert.strictEqual(cells[i].textContent, text);
 		});
 
 		const paginationNode = gridNode.querySelector('.dgrid-pagination');
-		assert.isNotNull(paginationNode);
+		assert.exists(paginationNode);
 	},
 
 	'basic DOM render - no columns'() {
 		const projector = new TestProjector();
+		projector.testProperties.features!.pagination = true;
 		projector.testProperties.columns = [];
 		projector.sandbox();
 
 		// Check to see if a dgrid grid rendered with pagination.
 		const gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 
 		const cells = gridNode.querySelectorAll('.dgrid-cell');
 		assert.strictEqual(cells.length, 0);
 
 		const paginationNode = gridNode.querySelector('.dgrid-pagination');
-		assert.isNotNull(paginationNode);
+		assert.exists(paginationNode);
 	},
 
 	'basic DOM render - null columns'() {
 		const projector = new TestProjector();
+		projector.testProperties.features!.pagination = true;
 		projector.testProperties.columns = undefined;
 		projector.sandbox();
 
 		// Check to see if a dgrid grid rendered with pagination.
 		const gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 
 		const cells = gridNode.querySelectorAll('.dgrid-cell');
 		assert.strictEqual(cells.length, 0);
 
 		const paginationNode = gridNode.querySelector('.dgrid-pagination');
-		assert.isNotNull(paginationNode);
+		assert.exists(paginationNode);
 	},
 
-	'Recreate Grid on property change'() {
+	'recreate grid on property change'() {
 		const projector = new TestProjector();
+		projector.testProperties.features!.pagination = true;
 		projector.sandbox();
 
 		// Check to see if a dgrid grid rendered with pagination.
 		let gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 		const gridId = gridNode.id;
 
 		let paginationNode = gridNode.querySelector('.dgrid-pagination');
-		assert.isNotNull(paginationNode);
+		assert.exists(paginationNode);
 
 		delete projector.testProperties.features;
 		projector.invalidate();
@@ -318,9 +304,9 @@ registerSuite('dgrid/Dgrid DOM', {
 		gridNode = projector.root.firstChild! as HTMLElement;
 		assert.notStrictEqual(gridNode.id, gridId);
 		const cells = gridNode.querySelectorAll('.dgrid-cell');
-		assert.strictEqual(cells.length, 4);
+		assert.strictEqual(cells.length, 6);
 
-		['First', 'Last', 'first', 'last'].forEach((text, i) => {
+		['First', 'Last', 'first 1', 'last 1'].forEach((text, i) => {
 			assert.strictEqual(cells[i].textContent, text);
 		});
 
@@ -328,20 +314,21 @@ registerSuite('dgrid/Dgrid DOM', {
 		assert.isNull(paginationNode);
 	},
 
-	'Update Grid on property change'() {
+	'update grid on property change'() {
 		const projector = new TestProjector();
+		projector.testProperties.features!.pagination = true;
 		projector.testProperties.columns = [{ field: 'first', label: 'First' }, { field: 'last', label: 'Last' }];
 		projector.sandbox();
 
 		// Check to see if a dgrid grid rendered with pagination.
 		let gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 		const gridId = gridNode.id;
 
 		let cells = gridNode.querySelectorAll('.dgrid-cell');
-		assert.strictEqual(cells.length, 4);
+		assert.strictEqual(cells.length, 6);
 
-		['First', 'Last', 'first', 'last'].forEach((text, i) => {
+		['First', 'Last', 'first 1', 'last 1'].forEach((text, i) => {
 			assert.strictEqual(cells[i].textContent, text);
 		});
 
@@ -355,25 +342,25 @@ registerSuite('dgrid/Dgrid DOM', {
 		gridNode = projector.root.firstChild! as HTMLElement;
 		assert.strictEqual(gridNode.id, gridId);
 		cells = gridNode.querySelectorAll('.dgrid-cell');
-		assert.strictEqual(cells.length, 6);
+		assert.strictEqual(cells.length, 9);
 
-		['ID', 'First', 'Last', '1', 'first', 'last'].forEach((text, i) => {
+		['ID', 'First', 'Last', '1', 'first 1', 'last 1', '2', 'first 2', 'last 2'].forEach((text, i) => {
 			assert.strictEqual(cells[i].textContent, text);
 		});
 	},
 
-	'DOM Interactions': {
-		beforeEach: () => {
+	'DOM interactions': {
+		beforeEach() {
 			sandbox = document.createElement('div');
 			document.body.appendChild(sandbox);
 		},
 
-		afterEach: () => {
+		afterEach() {
 			document.body.removeChild(sandbox);
 		},
 
 		tests: {
-			'Restore page 1'() {
+			'restore page 1'() {
 				let refreshCount = 0;
 				let gridId: string;
 				return new Promise((resolve) => {
@@ -405,7 +392,9 @@ registerSuite('dgrid/Dgrid DOM', {
 						}
 					});
 					const projector = new TestProjector();
-					for (let i = 2; i < 100; i++) {
+					projector.testProperties.features!.pagination = true;
+
+					for (let i = 3; i < 100; i++) {
 						projector.testProperties.data.push({
 							id: i,
 							first: 'First' + i,
@@ -417,7 +406,7 @@ registerSuite('dgrid/Dgrid DOM', {
 				});
 			},
 
-			'Restore page 2'() {
+			'restore page 2'() {
 				let refreshCount = 0;
 				let gridId: string;
 				return new Promise((resolve) => {
@@ -457,7 +446,8 @@ registerSuite('dgrid/Dgrid DOM', {
 					});
 
 					const projector = new TestProjector();
-					for (let i = 2; i < 100; i++) {
+					projector.testProperties.features!.pagination = true;
+					for (let i = 3; i < 100; i++) {
 						projector.testProperties.data.push({
 							id: i,
 							first: 'First' + i,
@@ -471,7 +461,7 @@ registerSuite('dgrid/Dgrid DOM', {
 		}
 	},
 
-	'Keyboard tab index'() {
+	'keyboard tab index'() {
 		const projector = new TestProjector();
 		projector.testProperties.features!.keyboard = true;
 		projector.testProperties.tabIndex = 5;
@@ -479,10 +469,73 @@ registerSuite('dgrid/Dgrid DOM', {
 
 		// Check to see if a dgrid grid rendered with pagination.
 		const gridNode = projector.root.firstChild! as HTMLElement;
-		assert.isNotNull(gridNode);
+		assert.exists(gridNode);
 
 		const cells = gridNode.querySelectorAll('th.dgrid-cell');
-		assert.isNotNull(cells);
+		assert.exists(cells);
 		assert.strictEqual('5', cells[0].getAttribute('tabindex'));
+	},
+
+	selection: {
+		beforeEach() {
+			sandbox = document.createElement('div');
+			document.body.appendChild(sandbox);
+
+			projector = new TestProjector();
+			projector.testProperties.features!.selection = true;
+		},
+		afterEach() {
+			document.body.removeChild(sandbox);
+		},
+		tests: {
+			'basic selection render'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						(event as any).grid.select(1);
+						(event as any).grid.deselect(1);
+						resolve();
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.append(sandbox);
+				});
+			},
+			'basic selection render with null selection'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						assert.strictEqual(Object.keys((event as any).grid.selection).length, 0);
+						resolve();
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.testProperties.selection = undefined;
+					projector.append(sandbox);
+				});
+			},
+			'selection events'() {
+				return new Promise((resolve) => {
+					let selected = false;
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						(event as any).grid.select(1);
+						(event as any).grid.deselect(1);
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.testProperties.onSelect = (selectedData: SelectionData) => {
+						selected = true;
+						assert.strictEqual(selectedData.type, SelectionType.row);
+						assert.strictEqual(1, selectedData.data.length);
+						assert.strictEqual(1, selectedData.data[0].id);
+						assert.strictEqual('first 1', selectedData.data[0].first);
+					};
+					projector.testProperties.onDeselect = (selectedData: SelectionData) => {
+						assert.isTrue(selected);
+						assert.strictEqual(selectedData.type, SelectionType.row);
+						assert.strictEqual(1, selectedData.data.length);
+						assert.strictEqual(1, selectedData.data[0].id);
+						assert.strictEqual('first 1', selectedData.data[0].first);
+						resolve();
+					};
+					projector.append(sandbox);
+				});
+			}
+		}
 	}
 });

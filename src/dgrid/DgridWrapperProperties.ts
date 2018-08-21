@@ -7,6 +7,10 @@ export enum SelectionMode {
 	extended = 'extended'
 }
 
+export interface Selections {
+	[id: string]: boolean;
+}
+
 export interface DgridWrapperProperties extends WidgetProperties {
 	features?: {
 		// Setting pagination to true turns off infinite scrolling and displays rows in discrete pages.
@@ -48,9 +52,11 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	// See https://github.com/SitePen/dgrid/blob/master/Selection.js for documenation and default values.
 	deselectOnRefresh?: boolean;
 	allowSelectAll?: boolean;
-	selection?: { [id: string]: boolean };
+	selection?: Selections;
 	selectionMode?: SelectionMode;
 	allowTextSelection?: boolean;
+	onSelect?: (selected: SelectionData, selections: Selections) => void;
+	onDeselect?: (deselected: SelectionData, selections: Selections) => void;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
@@ -83,5 +89,15 @@ export interface Column {
 export type ColumnSpec = { [key: string]: Column | string } | Column[];
 
 export type Formatter = (value: any, object: any) => string;
+
+export enum SelectionType {
+	row = 'row',
+	cell = 'cell'
+}
+
+export interface SelectionData {
+	type: SelectionType;
+	data: any[];
+}
 
 export default DgridWrapperProperties;
