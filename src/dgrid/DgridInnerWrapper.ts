@@ -86,6 +86,9 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 		if (newProperties.columns != null) {
 			newProperties.columns = duplicateColumnDef(newProperties.columns);
 		}
+		if ('selection' in properties && properties.selection == null) {
+			newProperties.selection = {};
+		}
 		return newProperties;
 	}
 

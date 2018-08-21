@@ -4,11 +4,13 @@ import * as Grid from 'dgrid/Grid';
 import * as OnDemandGrid from 'dgrid/OnDemandGrid';
 import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
+import * as Selection from 'dgrid/Selection';
 
 export function buildConstructor(properties: DgridInnerWrapperProperties, emitGridState: () => void): any {
-	const { pagination, keyboard } = properties.features || {
+	const { pagination, keyboard, selection } = properties.features || {
 		pagination: false,
-		keyboard: false
+		keyboard: false,
+		selection: false
 	};
 
 	let mixins: any = [];
@@ -27,6 +29,10 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 
 	if (keyboard) {
 		mixins.push(Keyboard);
+	}
+
+	if (selection) {
+		mixins.push(Selection);
 	}
 
 	return declare(mixins as any, overrides);

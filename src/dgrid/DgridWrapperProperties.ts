@@ -1,11 +1,20 @@
 import { WidgetProperties } from '@dojo/framework/widget-core/interfaces';
 
+export enum SelectionMode {
+	none = 'none',
+	multiple = 'multiple',
+	single = 'single',
+	extended = 'extended'
+}
+
 export interface DgridWrapperProperties extends WidgetProperties {
 	features?: {
 		// Setting pagination to true turns off infinite scrolling and displays rows in discrete pages.
 		pagination?: boolean;
 		// Add keyboard navigation capability.
 		keyboard?: boolean;
+		// Add selection capabilities to a grid.
+		selection?: boolean;
 	};
 
 	// Grid properties
@@ -16,10 +25,12 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	data: {}[];
 
 	// _StoreMixin properties
+	// See https://github.com/SitePen/dgrid/blob/master/_StoreMixin.js for documenation and default values.
 	noDataMessage?: string;
 	loadingMessage?: string;
 
 	// Pagination properties
+	// See https://github.com/SitePen/dgrid/blob/master/extensions/Pagination.js for documenation and default values.
 	rowsPerPage?: number;
 	pagingTextBox?: boolean;
 	previousNextArrows?: boolean;
@@ -29,13 +40,29 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	showLoadingMessage?: boolean;
 
 	// Keyboard properties
+	// See https://github.com/SitePen/dgrid/blob/master/Keyboard.js for documenation and default values.
 	pageSkip?: number;
 	tabIndex?: number;
+
+	// Selection properties
+	// See https://github.com/SitePen/dgrid/blob/master/Selection.js for documenation and default values.
+	deselectOnRefresh?: boolean;
+	allowSelectAll?: boolean;
+	selection?: { [id: string]: boolean };
+	selectionMode?: SelectionMode;
+	allowTextSelection?: boolean;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
 // These keys can not update an existing grid.  If they change, a new grid must be constructed.
-export const constructionKeys = ['previousNextArrows', 'firstLastArrows', 'pagingLinks'];
+export const constructionKeys = [
+	'previousNextArrows',
+	'firstLastArrows',
+	'pagingLinks',
+	'tabIndex',
+	'allowSelectAll',
+	'selection'
+];
 
 export interface Column {
 	field?: string;
