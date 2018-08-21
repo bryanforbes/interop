@@ -36,8 +36,18 @@ function buildSelectEvent(event: DgridSelectionEvent): SelectionData {
 	};
 	if (selectionType === SelectionType.row) {
 		event.rows &&
-			(data.data = event.rows.map((rowData) => {
-				return rowData.data;
+			(data.data = event.rows.map((rowData: any) => {
+				return {
+					item: rowData.data
+				};
+			}));
+	} else {
+		event.cells &&
+			(data.data = event.cells.map((cellData: any) => {
+				return {
+					item: cellData.row.data,
+					field: cellData.column.field
+				};
 			}));
 	}
 

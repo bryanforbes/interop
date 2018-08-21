@@ -18,7 +18,7 @@ export interface DgridWrapperProperties extends WidgetProperties {
 		// Add keyboard navigation capability.
 		keyboard?: boolean;
 		// Add selection capabilities to a grid.
-		selection?: boolean;
+		selection?: SelectionType;
 	};
 
 	// Grid properties
@@ -97,7 +97,12 @@ export enum SelectionType {
 
 export interface SelectionData {
 	type: SelectionType;
-	data: any[];
+	data: {
+		// The data item used to render the selected row.
+		item: any;
+		// If the type is "cell", this contains the field name that corresponds to the selected cell.
+		field?: string;
+	}[];
 }
 
 export default DgridWrapperProperties;

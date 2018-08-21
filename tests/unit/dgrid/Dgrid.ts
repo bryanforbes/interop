@@ -482,7 +482,7 @@ registerSuite('dgrid/Dgrid DOM', {
 			document.body.appendChild(sandbox);
 
 			projector = new TestProjector();
-			projector.testProperties.features!.selection = true;
+			projector.testProperties.features!.selection = SelectionType.row;
 		},
 		afterEach() {
 			document.body.removeChild(sandbox);
@@ -522,15 +522,15 @@ registerSuite('dgrid/Dgrid DOM', {
 						selected = true;
 						assert.strictEqual(selectedData.type, SelectionType.row);
 						assert.strictEqual(1, selectedData.data.length);
-						assert.strictEqual(1, selectedData.data[0].id);
-						assert.strictEqual('first 1', selectedData.data[0].first);
+						assert.strictEqual(1, selectedData.data[0].item.id);
+						assert.strictEqual('first 1', selectedData.data[0].item.first);
 					};
 					projector.testProperties.onDeselect = (selectedData: SelectionData) => {
 						assert.isTrue(selected);
 						assert.strictEqual(selectedData.type, SelectionType.row);
 						assert.strictEqual(1, selectedData.data.length);
-						assert.strictEqual(1, selectedData.data[0].id);
-						assert.strictEqual('first 1', selectedData.data[0].first);
+						assert.strictEqual(1, selectedData.data[0].item.id);
+						assert.strictEqual('first 1', selectedData.data[0].item.first);
 						resolve();
 					};
 					projector.append(sandbox);
