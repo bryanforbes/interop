@@ -8,10 +8,12 @@ import * as StoreMixin from 'dgrid/_StoreMixin';
 import * as OnDemandGrid from 'dgrid/OnDemandGrid';
 import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
-import * as MemoryStore from 'dstore/Memory';
 import * as Selection from 'dgrid/Selection';
 import { DgridInnerWrapperProperties } from './DgridInnerWrapperProperties';
 import { buildConstructor } from './dgridConstructorFactory';
+import * as declare from 'dojo/_base/declare';
+import * as MemoryStore from 'dstore/Memory';
+import * as TreeStore from 'dstore/Tree';
 
 interface DgridSelectionEvent extends Event {
 	rows?: { data: any }[];
@@ -114,12 +116,26 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 		const newProperties = { ...properties } as any;
 		delete newProperties.features;
 		if (newProperties.data != null) {
-			newProperties.collection = new MemoryStore({ data: this.properties.data });
+			if (this.properties.features && this.properties.features.tree) {
+				const Store = declare([MemoryStore, TreeStore] as any);
+				newProperties.collection = new Store({
+					data: newProperties.data,
+					getRootCollection: function() {
+						return this.root.filter((item: any) => {
+							return item.parent == null;
+						});
+					}
+				}).getRootCollection();
+			} else {
+				newProperties.collection = new MemoryStore({
+					data: newProperties.data
+				});
+			}
 		}
 		if (newProperties.columns != null) {
 			newProperties.columns = duplicateColumnDef(newProperties.columns);
 		}
-		if ('selection' in properties && properties.selection == null) {
+		if ('selection' in newProperties && newProperties.selection == null) {
 			newProperties.selection = {};
 		}
 		return newProperties;

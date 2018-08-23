@@ -537,5 +537,86 @@ registerSuite('dgrid/Dgrid DOM', {
 				});
 			}
 		}
+	},
+
+	cellselection: {
+		beforeEach() {
+			sandbox = document.createElement('div');
+			document.body.appendChild(sandbox);
+
+			projector = new TestProjector();
+			projector.testProperties.features!.selection = SelectionType.cell;
+		},
+		afterEach() {
+			document.body.removeChild(sandbox);
+		},
+		tests: {
+			'basic selection render'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						const grid = (event as any).grid;
+						const firstCell = grid.domNode.querySelectorAll('td.dgrid-cell')[0];
+						(event as any).grid.select(firstCell);
+						(event as any).grid.deselect(firstCell);
+						resolve();
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.append(sandbox);
+				});
+			},
+			'selection events'() {
+				return new Promise((resolve) => {
+					let selected = false;
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						const grid = (event as any).grid;
+						const firstCell = grid.domNode.querySelectorAll('td.dgrid-cell')[0];
+						(event as any).grid.select(firstCell);
+						(event as any).grid.deselect(firstCell);
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.testProperties.onSelect = (selectedData: SelectionData) => {
+						selected = true;
+						assert.strictEqual(selectedData.type, SelectionType.cell);
+						assert.strictEqual(1, selectedData.data.length);
+						assert.strictEqual(1, selectedData.data[0].item.id);
+						assert.strictEqual('first 1', selectedData.data[0].item.first);
+						assert.strictEqual('first', selectedData.data[0].field);
+					};
+					projector.testProperties.onDeselect = (selectedData: SelectionData) => {
+						assert.isTrue(selected);
+						assert.strictEqual(selectedData.type, SelectionType.cell);
+						assert.strictEqual(1, selectedData.data.length);
+						assert.strictEqual(1, selectedData.data[0].item.id);
+						assert.strictEqual('first 1', selectedData.data[0].item.first);
+						assert.strictEqual('first', selectedData.data[0].field);
+						resolve();
+					};
+					projector.append(sandbox);
+				});
+			}
+		}
+	},
+
+	tree: {
+		beforeEach() {
+			sandbox = document.createElement('div');
+			document.body.appendChild(sandbox);
+
+			projector = new TestProjector();
+			projector.testProperties.features!.tree = true;
+		},
+		afterEach() {
+			document.body.removeChild(sandbox);
+		},
+		tests: {
+			'basic tree render'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						resolve();
+					});
+					projector.append(sandbox);
+				});
+			}
+		}
 	}
 });

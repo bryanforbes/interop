@@ -19,6 +19,11 @@ export interface DgridWrapperProperties extends WidgetProperties {
 		keyboard?: boolean;
 		// Add selection capabilities to a grid.
 		selection?: SelectionType;
+		// Support hierarchical data
+		// When tree is enabled, the items in the data array are expected to have the following properties:
+		//  - hasChildren: boolean, true indicates this item has children
+		//  - parent: ID, if this item is a child, parent is the ID of the parent item.
+		tree?: boolean;
 	};
 
 	// Grid properties
@@ -57,6 +62,11 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	allowTextSelection?: boolean;
 	onSelect?: (selected: SelectionData, selections: Selections) => void;
 	onDeselect?: (deselected: SelectionData, selections: Selections) => void;
+
+	// Tree properties
+	collapseOnRefresh?: boolean;
+	enableTreeTransitions?: boolean;
+	treeIndentWidth?: number;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
@@ -67,7 +77,8 @@ export const constructionKeys = [
 	'pagingLinks',
 	'tabIndex',
 	'allowSelectAll',
-	'selection'
+	'selection',
+	'treeIndentWidth'
 ];
 
 export interface Column {
