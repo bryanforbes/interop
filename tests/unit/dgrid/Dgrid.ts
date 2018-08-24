@@ -618,5 +618,67 @@ registerSuite('dgrid/Dgrid DOM', {
 				});
 			}
 		}
+	},
+
+	'column hider': {
+		beforeEach() {
+			sandbox = document.createElement('div');
+			document.body.appendChild(sandbox);
+
+			projector = new TestProjector();
+			projector.testProperties.features!.columnHider = true;
+		},
+		afterEach() {
+			document.body.removeChild(sandbox);
+		},
+		tests: {
+			'basic column hider render'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						resolve();
+					});
+					projector.append(sandbox);
+				});
+			},
+			'column hider events'() {
+				return new Promise((resolve) => {
+					let selected = false;
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						const grid = (event as any).grid;
+						grid.toggleColumnHiddenState('first');
+						grid.toggleColumnHiddenState('first');
+					});
+					let eventCount = 0;
+					projector.testProperties.onColumnStateChange = (data) => {
+						eventCount++;
+						switch (eventCount) {
+							case 1: {
+								assert.strictEqual(data.field, 'first');
+								assert.strictEqual(data.id, 'first');
+								assert.isTrue(data.hidden);
+								break;
+							}
+							case 2: {
+								assert.strictEqual(data.field, 'first');
+								assert.strictEqual(data.id, 'first');
+								assert.isFalse(data.hidden);
+								resolve();
+								break;
+							}
+						}
+					};
+					projector.testProperties.onDeselect = (selectedData: SelectionData) => {
+						assert.isTrue(selected);
+						assert.strictEqual(selectedData.type, SelectionType.cell);
+						assert.strictEqual(1, selectedData.data.length);
+						assert.strictEqual(1, selectedData.data[0].item.id);
+						assert.strictEqual('first 1', selectedData.data[0].item.first);
+						assert.strictEqual('first', selectedData.data[0].field);
+						resolve();
+					};
+					projector.append(sandbox);
+				});
+			}
+		}
 	}
 });

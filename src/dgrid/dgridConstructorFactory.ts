@@ -6,6 +6,7 @@ import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
 import * as Selection from 'dgrid/Selection';
 import * as CellSelection from 'dgrid/CellSelection';
+import * as ColumnHider from 'dgrid/extensions/ColumnHider';
 import * as Tree from 'dgrid/Tree';
 import { DgridWrapperFeatures, SelectionType } from './DgridWrapperProperties';
 import * as MemoryStore from 'dstore/Memory';
@@ -13,11 +14,12 @@ import * as TreeStore from 'dstore/Tree';
 import * as Trackable from 'dstore/Trackable';
 
 export function buildConstructor(properties: DgridInnerWrapperProperties, emitGridState: () => void): any {
-	const { pagination, keyboard, selection, tree } = properties.features || {
+	const { pagination, keyboard, selection, tree, columnHider } = properties.features || {
 		pagination: false,
 		keyboard: false,
 		selection: undefined,
-		tree: false
+		tree: false,
+		columnHider: false
 	};
 
 	let mixins: any = [];
@@ -46,6 +48,9 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 		mixins.push(selection === SelectionType.row ? Selection : CellSelection);
 	}
 
+	if (columnHider) {
+		mixins.push(ColumnHider);
+	}
 	return declare(mixins as any, overrides);
 }
 

@@ -23,6 +23,8 @@ export interface DgridWrapperFeatures {
 	//  - hasChildren: boolean, true indicates this item has children
 	//  - parent: ID, if this item is a child, parent is the ID of the parent item.
 	tree?: boolean;
+	// Enable the column hider extension.
+	columnHider?: boolean;
 }
 
 export interface DgridWrapperProperties extends WidgetProperties {
@@ -36,12 +38,12 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	data: {}[];
 
 	// _StoreMixin properties
-	// See https://github.com/SitePen/dgrid/blob/master/_StoreMixin.js for documenation and default values.
+	// See https://github.com/SitePen/dgrid/blob/master/_StoreMixin.js for documentation and default values.
 	noDataMessage?: string;
 	loadingMessage?: string;
 
 	// Pagination properties
-	// See https://github.com/SitePen/dgrid/blob/master/extensions/Pagination.js for documenation and default values.
+	// See https://github.com/SitePen/dgrid/blob/master/extensions/Pagination.js for documentation and default values.
 	rowsPerPage?: number;
 	pagingTextBox?: boolean;
 	previousNextArrows?: boolean;
@@ -51,12 +53,12 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	showLoadingMessage?: boolean;
 
 	// Keyboard properties
-	// See https://github.com/SitePen/dgrid/blob/master/Keyboard.js for documenation and default values.
+	// See https://github.com/SitePen/dgrid/blob/master/Keyboard.js for documentation and default values.
 	pageSkip?: number;
 	tabIndex?: number;
 
 	// Selection properties
-	// See https://github.com/SitePen/dgrid/blob/master/Selection.js for documenation and default values.
+	// See https://github.com/SitePen/dgrid/blob/master/Selection.js for documentation and default values.
 	deselectOnRefresh?: boolean;
 	allowSelectAll?: boolean;
 	selection?: Selections;
@@ -66,9 +68,13 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	onDeselect?: (deselected: SelectionData, selections: Selections) => void;
 
 	// Tree properties
+	// See https://github.com/SitePen/dgrid/blob/master/Tree.js for documentation and default values.
 	collapseOnRefresh?: boolean;
 	enableTreeTransitions?: boolean;
 	treeIndentWidth?: number;
+
+	// Column Hider properties
+	onColumnStateChange?: (columnChange: ColumnStateChangeData) => void;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
@@ -116,6 +122,12 @@ export interface SelectionData {
 		// If the type is "cell", this contains the field name that corresponds to the selected cell.
 		field?: string;
 	}[];
+}
+
+export interface ColumnStateChangeData {
+	field?: string;
+	id?: string | number;
+	hidden: boolean;
 }
 
 export default DgridWrapperProperties;

@@ -2,7 +2,13 @@ import { dom } from '@dojo/framework/widget-core/d';
 import { DNode } from '@dojo/framework/widget-core/interfaces';
 import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
 import { duplicate } from '@dojo/core/lang';
-import { DgridWrapperProperties, SelectionData, SelectionType } from './DgridWrapperProperties';
+import {
+	DgridWrapperProperties,
+	SelectionData,
+	SelectionType,
+	Column,
+	ColumnStateChangeData
+} from './DgridWrapperProperties';
 import * as Grid from 'dgrid/Grid';
 import * as StoreMixin from 'dgrid/_StoreMixin';
 import * as OnDemandGrid from 'dgrid/OnDemandGrid';
@@ -11,11 +17,6 @@ import * as Pagination from 'dgrid/extensions/Pagination';
 import * as Selection from 'dgrid/Selection';
 import { DgridInnerWrapperProperties } from './DgridInnerWrapperProperties';
 import { buildConstructor, buildCollection } from './dgridConstructorFactory';
-
-interface DgridSelectionEvent extends Event {
-	rows?: { data: any }[];
-	cells?: { data: any }[];
-}
 
 /**
  * When a dgrid grid is destroyed some of its state will need to be restored when the next
@@ -51,6 +52,25 @@ function buildSelectEvent(event: DgridSelectionEvent): SelectionData {
 	}
 
 	return data;
+}
+
+interface DgridSelectionEvent extends Event {
+	rows?: { data: any }[];
+	cells?: { data: any }[];
+}
+
+interface DgridColumnHiderEvent extends Event {
+	grid: DgridGrid;
+	column: Column;
+	hidden: boolean;
+}
+
+function buildColumnStateChange(event: DgridColumnHiderEvent): ColumnStateChangeData {
+	return {
+		field: event.column.field,
+		id: event.column.id,
+		hidden: event.hidden
+	};
 }
 
 /**
@@ -137,9 +157,9 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 	private registerGridEvents(): void {
 		const properties = this.properties;
 		if (properties.features) {
-			const { selection } = properties.features;
+			const { selection, columnHider } = properties.features;
+			const grid = this.grid;
 			if (selection) {
-				const grid = this.grid;
 				grid.on('dgrid-select', (event: DgridSelectionEvent) => {
 					const onSelect = properties.onSelect;
 					onSelect && onSelect(buildSelectEvent(event), grid.selection);
@@ -147,6 +167,12 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 				grid.on('dgrid-deselect', (event: DgridSelectionEvent) => {
 					const onDeselect = properties.onDeselect;
 					onDeselect && onDeselect(buildSelectEvent(event), grid.selection);
+				});
+			}
+			if (columnHider) {
+				grid.on('dgrid-columnstatechange', (event: DgridColumnHiderEvent) => {
+					const onColumnStateChange = properties.onColumnStateChange;
+					onColumnStateChange && onColumnStateChange(buildColumnStateChange(event));
 				});
 			}
 		}
