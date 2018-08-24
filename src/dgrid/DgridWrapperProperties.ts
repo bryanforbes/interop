@@ -11,20 +11,22 @@ export interface Selections {
 	[id: string]: boolean;
 }
 
+export interface DgridWrapperFeatures {
+	// Setting pagination to true turns off infinite scrolling and displays rows in discrete pages.
+	pagination?: boolean;
+	// Add keyboard navigation capability.
+	keyboard?: boolean;
+	// Add selection capabilities to a grid.
+	selection?: SelectionType;
+	// Support hierarchical data
+	// When tree is enabled, the items in the data array are expected to have the following properties:
+	//  - hasChildren: boolean, true indicates this item has children
+	//  - parent: ID, if this item is a child, parent is the ID of the parent item.
+	tree?: boolean;
+}
+
 export interface DgridWrapperProperties extends WidgetProperties {
-	features?: {
-		// Setting pagination to true turns off infinite scrolling and displays rows in discrete pages.
-		pagination?: boolean;
-		// Add keyboard navigation capability.
-		keyboard?: boolean;
-		// Add selection capabilities to a grid.
-		selection?: SelectionType;
-		// Support hierarchical data
-		// When tree is enabled, the items in the data array are expected to have the following properties:
-		//  - hasChildren: boolean, true indicates this item has children
-		//  - parent: ID, if this item is a child, parent is the ID of the parent item.
-		tree?: boolean;
-	};
+	features?: DgridWrapperFeatures;
 
 	// Grid properties
 	columns?: ColumnSpec;

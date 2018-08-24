@@ -10,10 +10,7 @@ import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
 import * as Selection from 'dgrid/Selection';
 import { DgridInnerWrapperProperties } from './DgridInnerWrapperProperties';
-import { buildConstructor } from './dgridConstructorFactory';
-import * as declare from 'dojo/_base/declare';
-import * as MemoryStore from 'dstore/Memory';
-import * as TreeStore from 'dstore/Tree';
+import { buildConstructor, buildCollection } from './dgridConstructorFactory';
 
 interface DgridSelectionEvent extends Event {
 	rows?: { data: any }[];
@@ -116,21 +113,7 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 		const newProperties = { ...properties } as any;
 		delete newProperties.features;
 		if (newProperties.data != null) {
-			if (this.properties.features && this.properties.features.tree) {
-				const Store = declare([MemoryStore, TreeStore] as any);
-				newProperties.collection = new Store({
-					data: newProperties.data,
-					getRootCollection: function() {
-						return this.root.filter((item: any) => {
-							return item.parent == null;
-						});
-					}
-				}).getRootCollection();
-			} else {
-				newProperties.collection = new MemoryStore({
-					data: newProperties.data
-				});
-			}
+			newProperties.collection = buildCollection(newProperties, this.properties.features);
 		}
 		if (newProperties.columns != null) {
 			newProperties.columns = duplicateColumnDef(newProperties.columns);

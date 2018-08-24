@@ -7,7 +7,10 @@ import * as Pagination from 'dgrid/extensions/Pagination';
 import * as Selection from 'dgrid/Selection';
 import * as CellSelection from 'dgrid/CellSelection';
 import * as Tree from 'dgrid/Tree';
-import { SelectionType } from './DgridWrapperProperties';
+import { DgridWrapperFeatures, SelectionType } from './DgridWrapperProperties';
+import * as MemoryStore from 'dstore/Memory';
+import * as TreeStore from 'dstore/Tree';
+import * as Trackable from 'dstore/Trackable';
 
 export function buildConstructor(properties: DgridInnerWrapperProperties, emitGridState: () => void): any {
 	const { pagination, keyboard, selection, tree } = properties.features || {
@@ -44,6 +47,30 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 	}
 
 	return declare(mixins as any, overrides);
+}
+
+export function buildCollection(properties: any, features?: DgridWrapperFeatures): any {
+	const treeEnabled = features && features.tree;
+	let mixins: any = [MemoryStore, Trackable];
+	let overrides: any = {};
+
+	if (treeEnabled) {
+		mixins.push(TreeStore);
+		overrides.getRootCollection = function() {
+			return this.root.filter((item: any) => {
+				return item.parent == null;
+			});
+		};
+	}
+
+	const Store = declare(mixins as any, overrides);
+	let collection = new Store({
+		data: properties.data
+	});
+	if (treeEnabled) {
+		collection = collection.getRootCollection();
+	}
+	return collection;
 }
 
 export default buildConstructor;
