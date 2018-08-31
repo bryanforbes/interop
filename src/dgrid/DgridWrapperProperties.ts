@@ -27,6 +27,8 @@ export interface DgridWrapperFeatures {
 	columnHider?: boolean;
 	// Enable the column reorder extension.
 	columnReorder?: boolean;
+	// Enable the column resizer extension.
+	columnResizer?: boolean;
 }
 
 export interface DgridWrapperProperties extends WidgetProperties {
@@ -76,7 +78,13 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	treeIndentWidth?: number;
 
 	// Column Hider properties
+	// See https://github.com/SitePen/dgrid/blob/master/extensions/ColumnHider.js for documentation and default values.
 	onColumnStateChange?: (columnChange: ColumnStateChangeData) => void;
+
+	// Column Resizers properties
+	// See https://github.com/SitePen/dgrid/blob/master/extensions/ColumnResizer.js for documentation and default values.
+	minWidth?: number;
+	adjustLastColumn?: boolean;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
