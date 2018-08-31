@@ -680,5 +680,28 @@ registerSuite('dgrid/Dgrid DOM', {
 				});
 			}
 		}
+	},
+
+	'column reorder': {
+		beforeEach() {
+			sandbox = document.createElement('div');
+			document.body.appendChild(sandbox);
+
+			projector = new TestProjector();
+			projector.testProperties.features!.columnReorder = true;
+		},
+		afterEach() {
+			document.body.removeChild(sandbox);
+		},
+		tests: {
+			'basic column reorder render'() {
+				return new Promise((resolve) => {
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						resolve();
+					});
+					projector.append(sandbox);
+				});
+			}
+		}
 	}
 });

@@ -25,6 +25,8 @@ export interface DgridWrapperFeatures {
 	tree?: boolean;
 	// Enable the column hider extension.
 	columnHider?: boolean;
+	// Enable the column reorder extension.
+	columnReorder?: boolean;
 }
 
 export interface DgridWrapperProperties extends WidgetProperties {
