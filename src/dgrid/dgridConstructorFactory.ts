@@ -6,6 +6,7 @@ import * as Keyboard from 'dgrid/Keyboard';
 import * as Pagination from 'dgrid/extensions/Pagination';
 import * as Selection from 'dgrid/Selection';
 import * as CellSelection from 'dgrid/CellSelection';
+import * as Selector from 'dgrid/Selector';
 import * as ColumnHider from 'dgrid/extensions/ColumnHider';
 import * as ColumnReorder from 'dgrid/extensions/ColumnReorder';
 import * as ColumnResizer from 'dgrid/extensions/ColumnResizer';
@@ -20,6 +21,7 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 		pagination,
 		keyboard,
 		selection,
+		selector,
 		tree,
 		columnHider,
 		columnReorder,
@@ -28,6 +30,7 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 		pagination: false,
 		keyboard: false,
 		selection: undefined,
+		selector: false,
 		tree: false,
 		columnHider: false,
 		columnReorder: false,
@@ -58,6 +61,9 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 
 	if (selection) {
 		mixins.push(selection === SelectionType.row ? Selection : CellSelection);
+		if (selector) {
+			mixins.push(Selector);
+		}
 	}
 
 	if (columnHider) {

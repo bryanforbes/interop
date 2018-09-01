@@ -535,6 +535,30 @@ registerSuite('dgrid/Dgrid DOM', {
 					};
 					projector.append(sandbox);
 				});
+			},
+			'selection events with selector'() {
+				return new Promise((resolve) => {
+					let selected = false;
+					sandbox.addEventListener('dgrid-refresh-complete', (event) => {
+						(event as any).grid.select(1);
+						(event as any).grid.deselect(1);
+					});
+					projector.testProperties.selectionMode = SelectionMode.multiple;
+					projector.testProperties.features!.selector = true;
+					(projector.testProperties.columns as any).selector = { selector: 'checkbox' };
+					projector.testProperties.onSelect = (selectedData: SelectionData) => {
+						selected = true;
+						const inputs = document.querySelectorAll('td.dgrid-selector input');
+						assert.isTrue((inputs[0] as HTMLInputElement).checked);
+					};
+					projector.testProperties.onDeselect = (selectedData: SelectionData) => {
+						assert.isTrue(selected);
+						const inputs = document.querySelectorAll('td.dgrid-selector input');
+						assert.isFalse((inputs[0] as HTMLInputElement).checked);
+						resolve();
+					};
+					projector.append(sandbox);
+				});
 			}
 		}
 	},

@@ -18,6 +18,8 @@ export interface DgridWrapperFeatures {
 	keyboard?: boolean;
 	// Add selection capabilities to a grid.
 	selection?: SelectionType;
+	// Add selector column to the grid.  selection must be set as well.
+	selector?: boolean;
 	// Support hierarchical data
 	// When tree is enabled, the items in the data array are expected to have the following properties:
 	//  - hasChildren: boolean, true indicates this item has children
@@ -108,6 +110,7 @@ export interface Column {
 	rowSpan?: number;
 	sortable?: boolean;
 	formatter?: string | Formatter;
+	selector?: string;
 
 	get?(item: any): any;
 	set?(item: any): any;
