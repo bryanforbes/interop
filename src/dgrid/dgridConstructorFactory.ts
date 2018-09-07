@@ -10,6 +10,8 @@ import * as Selector from 'dgrid/Selector';
 import * as ColumnHider from 'dgrid/extensions/ColumnHider';
 import * as ColumnReorder from 'dgrid/extensions/ColumnReorder';
 import * as ColumnResizer from 'dgrid/extensions/ColumnResizer';
+import * as CompoundColumns from 'dgrid/extensions/CompoundColumns';
+import * as ColumnSet from 'dgrid/ColumnSet';
 import * as Tree from 'dgrid/Tree';
 import { DgridWrapperFeatures, SelectionType } from './DgridWrapperProperties';
 import * as MemoryStore from 'dstore/Memory';
@@ -25,7 +27,9 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 		tree,
 		columnHider,
 		columnReorder,
-		columnResizer
+		columnResizer,
+		compoundColumns,
+		columnSet
 	} = properties.features || {
 		pagination: false,
 		keyboard: false,
@@ -34,7 +38,9 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 		tree: false,
 		columnHider: false,
 		columnReorder: false,
-		columnResizer: false
+		columnResizer: false,
+		compoundColumns: false,
+		columnSet: false
 	};
 
 	let mixins: any = [];
@@ -76,6 +82,14 @@ export function buildConstructor(properties: DgridInnerWrapperProperties, emitGr
 
 	if (columnResizer) {
 		mixins.push(ColumnResizer);
+	}
+
+	if (compoundColumns) {
+		mixins.push(CompoundColumns);
+	}
+
+	if (columnSet) {
+		mixins.push(ColumnSet);
 	}
 
 	return declare(mixins as any, overrides);

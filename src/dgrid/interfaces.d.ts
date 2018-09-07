@@ -373,7 +373,7 @@ declare module 'dgrid/ColumnSet' {
 
 	namespace ColumnSet {
 		export interface KwArgs extends Grid.KwArgs {
-			columnSets?: Array<Array<Grid.Column>>;
+			columnSets?: Array<Array<Grid.Column[]>>;
 		}
 	}
 

@@ -31,6 +31,10 @@ export interface DgridWrapperFeatures {
 	columnReorder?: boolean;
 	// Enable the column resizer extension.
 	columnResizer?: boolean;
+	// Enable the compound column extension.
+	compoundColumns?: boolean;
+	// Enable the column set mixin.
+	columnSet?: boolean;
 }
 
 export interface DgridWrapperProperties extends WidgetProperties {
@@ -87,6 +91,8 @@ export interface DgridWrapperProperties extends WidgetProperties {
 	// See https://github.com/SitePen/dgrid/blob/master/extensions/ColumnResizer.js for documentation and default values.
 	minWidth?: number;
 	adjustLastColumn?: boolean;
+
+	columnSets?: Array<Array<Column[]>>;
 }
 
 // List of dgrid property names that must be passed to dgrid when a grid is constructed.
@@ -111,6 +117,8 @@ export interface Column {
 	sortable?: boolean;
 	formatter?: string | Formatter;
 	selector?: string;
+	children?: Column[];
+	showChildHeaders?: boolean;
 
 	get?(item: any): any;
 	set?(item: any): any;

@@ -1,7 +1,7 @@
 import { dom } from '@dojo/framework/widget-core/d';
 import { DNode } from '@dojo/framework/widget-core/interfaces';
 import { WidgetBase } from '@dojo/framework/widget-core/WidgetBase';
-import { duplicate } from '@dojo/core/lang';
+import { duplicate } from '@dojo/framework/core/lang';
 import {
 	DgridWrapperProperties,
 	SelectionData,
@@ -138,6 +138,9 @@ export class DgridInnerWrapper extends WidgetBase<DgridInnerWrapperProperties> {
 		if (newProperties.columns != null) {
 			newProperties.columns = duplicateColumnDef(newProperties.columns);
 		}
+		if (newProperties.columnSets != null) {
+			newProperties.columnSets = duplicateColumnSets(newProperties.columnSets);
+		}
 		if ('selection' in newProperties && newProperties.selection == null) {
 			newProperties.selection = {};
 		}
@@ -190,6 +193,14 @@ function duplicateColumnDef(columnsSpec: Grid.ColumnSpec): Grid.ColumnSpec {
 	} else {
 		return duplicate(columnsSpec);
 	}
+}
+
+function duplicateColumnSets(columnSets: Array<Array<Grid.Column[]>>): Array<Array<Grid.Column[]>> {
+	return columnSets.map((subRows) => {
+		return subRows.map((subRow) => {
+			return subRow.map((column) => duplicate(column));
+		});
+	});
 }
 
 interface DgridProperties extends Grid.KwArgs, StoreMixin.KwArgs, Pagination.KwArgs, OnDemandGrid.KwArgs {}
